@@ -1,0 +1,22 @@
+# Secrets
+.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Data and models
+data/
+.cache/
+huggingface/
+models/
+qdrant_storage/
+
+# Eval output
+evaluation_results/
+
+# OS
+.DS_Store

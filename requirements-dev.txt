@@ -1,0 +1,18 @@
+# Extends prod dependencies — used locally and in CI only.
+# This file is NEVER copied into the Docker image.
+-r requirements.txt
+
+# Testing
+pytest
+pytest-asyncio
+httpx                   # needed by FastAPI TestClient
+
+# Evaluation
+ragas
+datasets
+pandas
+pyarrow
+scikit-learn
+scipy
+
+ruff
