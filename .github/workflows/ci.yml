@@ -34,6 +34,7 @@ jobs:
 
       - name: Run tests
         env:
+          APP_NAME: "LLMOps Backend"
           GEMINI_API_KEY: "test-key"
           QDRANT_URL: "http://localhost:6333"
           LANGFUSE_PUBLIC_KEY: ""
