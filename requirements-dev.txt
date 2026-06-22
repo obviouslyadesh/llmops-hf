@@ -1,17 +1,7 @@
 # Dev/CI dependencies — testing and linting only.
-# Does NOT extend requirements.txt to avoid numpy conflicts with eval tools.
-
-fastapi
-uvicorn
-qdrant-client
-pydantic-settings
-python-dotenv
-sentence-transformers
-torch==2.4.0
-google-genai
-langchain-google-genai
-langfuse
-python-multipart
+# Extends prod deps but excludes eval tools (ragas/datasets/pyarrow)
+# which conflict with numpy==2.5.0.
+-r requirements.txt
 
 # Testing
 pytest
