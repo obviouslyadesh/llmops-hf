@@ -1,0 +1,10 @@
+# Evaluation dependencies — run locally only, never in CI or Docker.
+# Install separately: pip install -r requirements-eval.txt
+# These have numpy<2 constraints that conflict with prod deps.
+
+ragas
+datasets
+pandas
+pyarrow==15.0.2
+scikit-learn
+scipy

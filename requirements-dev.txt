@@ -1,19 +1,22 @@
-# Extends prod dependencies — used locally and in CI only.
-# This file is NEVER copied into the Docker image.
--r requirements.txt
+# Dev/CI dependencies — testing and linting only.
+# Does NOT extend requirements.txt to avoid numpy conflicts with eval tools.
+
+fastapi
+uvicorn
+qdrant-client
+pydantic-settings
+python-dotenv
+sentence-transformers
+torch==2.4.0
+google-genai
+langchain-google-genai
+langfuse
+python-multipart
 
 # Testing
 pytest
 pytest-asyncio
-httpx                   # needed by FastAPI TestClient
+httpx
 
 # Linting & formatting
 ruff
-
-# Evaluation
-ragas
-datasets
-pandas
-pyarrow==15.0.2         # 16+ removes PyExtensionType which datasets still uses
-scikit-learn
-scipy
