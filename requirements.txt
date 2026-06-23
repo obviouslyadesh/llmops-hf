@@ -235,6 +235,8 @@ python-dotenv==1.2.2
     #   uvicorn
 python-multipart==0.0.32
     # via -r requirements.in
+aiofiles==24.1.0
+    # via fastapi staticfiles
 pyyaml==6.0.3
     # via
     #   huggingface-hub
