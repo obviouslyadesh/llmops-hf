@@ -723,18 +723,81 @@
     const thinking = addThinking();
 
     try {
-      const res = await fetch(`${API_URL}/chat`, {
+      const res = await fetch(`${API_URL}/chat/stream`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ question }),
       });
-      const data = await res.json();
-      thinking.remove();
-      if (res.ok) {
-        addMessage('assistant', data.answer, data.sources || []);
-      } else {
+
+      if (!res.ok) {
+        const data = await res.json();
+        thinking.remove();
         addMessage('assistant', `Error: ${data.detail || 'Something went wrong'}`);
+        return;
       }
+
+      thinking.remove();
+
+      // Create assistant message bubble for streaming into
+      if (document.getElementById('emptyState')) {
+        document.getElementById('emptyState').remove();
+      }
+      const msgEl = document.createElement('div');
+      msgEl.className = 'message assistant';
+      const roleLabel = document.createElement('div');
+      roleLabel.className = 'message-role';
+      roleLabel.textContent = 'assistant';
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.textContent = '';
+      msgEl.appendChild(roleLabel);
+      msgEl.appendChild(bubble);
+      messagesEl.appendChild(msgEl);
+
+      // Read stream
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let sources = [];
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = line.slice(6).trim();
+          if (payload === '[DONE]') break;
+
+          try {
+            const parsed = JSON.parse(payload);
+            if (parsed.sources) {
+              sources = parsed.sources;
+            } else if (parsed.token) {
+              bubble.textContent += parsed.token;
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+          } catch {}
+        }
+      }
+
+      // Append source tags after streaming completes
+      if (sources.length) {
+        const sourcesEl = document.createElement('div');
+        sourcesEl.className = 'sources';
+        sources.forEach(s => {
+          const tag = document.createElement('span');
+          tag.className = 'source-tag';
+          tag.textContent = `📎 ${s}`;
+          sourcesEl.appendChild(tag);
+        });
+        msgEl.appendChild(sourcesEl);
+      }
+
     } catch (err) {
       thinking.remove();
       addMessage('assistant', `Connection error: ${err.message}`);
