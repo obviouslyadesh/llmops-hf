@@ -12,8 +12,7 @@ from app.core.middleware import APIKeyMiddleware, RequestTimingMiddleware
 
 app = FastAPI(title=settings.APP_NAME, version="1.0.0")
 
-# Middleware runs in reverse order of registration.
-# CORS must be outermost, then API key, then timing.
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,6 +38,4 @@ def health():
 def root():
     return FileResponse("app/static/index.html")
 
-
-# Serve static files (frontend)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

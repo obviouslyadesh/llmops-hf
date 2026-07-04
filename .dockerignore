@@ -1,4 +1,3 @@
-# Python
 venv/
 .venv/
 __pycache__/
@@ -7,37 +6,27 @@ __pycache__/
 *.pyd
 .pytest_cache/
 
-# Git
 .git/
 .gitignore
 
-# Dev dependencies — never needed inside the image
 requirements-dev.txt
 
-# Uploaded data — mounted at runtime, not baked into image
 data/
 
-# Model cache — re-downloaded at runtime or via volume
 .cache/
 huggingface/
 models/
 
-# Vector DB storage — managed by the qdrant container
 qdrant_storage/
 
-# Eval output
 evaluation_results/
 
-# OS
 .DS_Store
 
-# Secrets — should be passed via env_file, never baked in
 .env
 
-# Test files — not needed in prod image
 tests/
 evaluation/
 
-# Document samples
 *.pdf
 *.docx

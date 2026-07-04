@@ -13,9 +13,6 @@ from app.services.text_chunker import TextChunker
 
 router = APIRouter()
 
-# All of these are module-level singletons.
-# EmbeddingService shares the model loaded in app.core.models —
-# no extra model copy is created here.
 processor = DocumentProcessor()
 chunker = TextChunker()
 embedding_service = EmbeddingService()

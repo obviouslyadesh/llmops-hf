@@ -27,7 +27,9 @@ API_KEY = os.getenv("API_KEY", "")
 
 QUESTIONS_FILE = "evaluation/sample_questions.json"
 
-RESULTS_FILE = "evaluation_results/baseline_results.json"
+BASELINE_FILE = "evaluation_results/baseline_results.json"
+
+RESULTS_FILE = "evaluation_results/reranked_results.json"
 
 HEADERS = {
     "Content-Type": "application/json",
@@ -40,11 +42,11 @@ os.makedirs("evaluation_results", exist_ok=True)
 # Judge LLM
 # --------------------------------------------------------------------
 
-print("Loading Ollama evaluation model...")
+print("Loading Groq evaluation model...")
 
 judge_llm = LangchainLLMWrapper(
     ChatOllama(
-        model="llama3:latest",
+        model="qwen2.5-coder:14b-instruct",
         temperature=0,
     )
 )
@@ -70,10 +72,10 @@ print("Embeddings ready.\n")
 
 def ask_question(
     question: str,
-    rerank: bool = False,
+    rerank: bool = True,
 ) -> dict:
     """
-    Calls backend /chat endpoint.
+    Calls backend /chat endpoint with reranking enabled.
 
     Returns
 
@@ -106,13 +108,7 @@ def ask_question(
 
 def safe_score(value):
     """
-    RAGAS sometimes returns:
-
-        float
-        list[float]
-        NaN
-
-    Convert everything into a float.
+    Convert RAGAS outputs into a float.
     """
 
     if isinstance(value, list):
@@ -143,7 +139,7 @@ def safe_score(value):
 
 def run_evaluation():
     print("=" * 70)
-    print("RAGAS Evaluation — Baseline (No Reranking)")
+    print("RAGAS Evaluation — With Cross-Encoder Reranking")
     print("=" * 70)
 
     with open(QUESTIONS_FILE) as f:
@@ -167,7 +163,7 @@ def run_evaluation():
         try:
             result = ask_question(
                 question=question,
-                rerank=False,
+                rerank=True,
             )
 
             answer = result.get("answer", "")
@@ -180,7 +176,7 @@ def run_evaluation():
 
             print(f"  ✓ {len(contexts)} chunks | {answer[:70]}...")
 
-            # avoid hitting Groq RPM limits
+            # avoid Groq rate limits
             time.sleep(1)
 
         except Exception as e:
@@ -226,7 +222,7 @@ def run_evaluation():
 
     print("\n")
     print("=" * 70)
-    print("Baseline Results")
+    print("Reranked Results")
     print("=" * 70)
 
     print(f"Faithfulness      : {faithfulness_score:.4f}")
@@ -235,8 +231,73 @@ def run_evaluation():
     print("-" * 70)
     print(f"Average           : {average_score:.4f}")
 
+    # --------------------------------------------------------------
+    # Compare against baseline
+    # --------------------------------------------------------------
+
+    if os.path.exists(BASELINE_FILE):
+        with open(BASELINE_FILE) as f:
+            baseline = json.load(f)
+
+        baseline_scores = baseline["scores"]
+
+        print("\n")
+        print("=" * 70)
+        print("Improvement over Baseline")
+        print("=" * 70)
+
+        comparisons = [
+            (
+                "Faithfulness",
+                faithfulness_score,
+                baseline_scores["faithfulness"],
+            ),
+            (
+                "Answer Relevancy",
+                answer_relevancy_score,
+                baseline_scores["answer_relevancy"],
+            ),
+            (
+                "Context Precision",
+                context_precision_score,
+                baseline_scores["context_precision"],
+            ),
+            (
+                "Average",
+                average_score,
+                baseline_scores["average"],
+            ),
+        ]
+
+        for name, new_score, old_score in comparisons:
+            diff = new_score - old_score
+
+            if diff > 0:
+                arrow = "↑"
+            elif diff < 0:
+                arrow = "↓"
+            else:
+                arrow = "="
+
+            print(
+                f"{name:<20}"
+                f"{old_score:.4f}"
+                f"  ->  "
+                f"{new_score:.4f}"
+                f"   ({arrow} {diff:+.4f})"
+            )
+
+    else:
+        print("\nBaseline results not found.")
+        print("Run baseline evaluation first:")
+        print("python3.12 evaluation/run_eval.py")
+
+    # --------------------------------------------------------------
+    # Save results
+    # --------------------------------------------------------------
+
     output = {
-        "run": "baseline",
+        "run": "reranked",
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "num_questions": len(rows["question"]),
         "scores": {
@@ -271,7 +332,6 @@ def run_evaluation():
 
     print("\n")
     print(f"✓ Results saved to {RESULTS_FILE}")
-    print("Next: python3.12 evaluation/run_eval_reranked.py")
 
     return output
 

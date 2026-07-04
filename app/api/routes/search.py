@@ -7,8 +7,6 @@ from app.services.qdrant_service import QdrantService
 
 router = APIRouter()
 
-# Instantiated once at module load — EmbeddingService no longer
-# loads a model itself, so this is now a cheap stateless object.
 embedding_service = EmbeddingService()
 qdrant_service = QdrantService()
 

@@ -1,12 +1,7 @@
-# Dev/CI dependencies — testing and linting only.
-# Extends prod deps but excludes eval tools (ragas/datasets/pyarrow)
-# which conflict with numpy==2.5.0.
 -r requirements.txt
 
-# Testing
 pytest
 pytest-asyncio
 httpx
 
-# Linting & formatting
 ruff

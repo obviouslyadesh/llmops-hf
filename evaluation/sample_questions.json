@@ -1,8 +1,34 @@
 [
   {
-    "question": "What stores embeddings?"
+    "question": "What is RAG and why is it used?",
+    "ground_truth": "RAG stands for Retrieval-Augmented Generation. It combines information retrieval with text generation by retrieving relevant documents from an external knowledge base and using them as context for generating answers. It is used to reduce hallucination, keep responses grounded in real data, and answer questions about documents the model was never trained on."
   },
   {
-    "question": "What is RAG?"
+    "question": "What stores embeddings in a RAG system?",
+    "ground_truth": "Vector databases store embeddings in a RAG system. They are purpose-built storage systems for high-dimensional embedding vectors that support approximate nearest neighbor search. Examples include Qdrant, Pinecone, Weaviate, and Chroma."
+  },
+  {
+    "question": "What is chunking strategy and why does it matter?",
+    "ground_truth": "Chunking strategy refers to how documents are split before embedding. It matters because chunk size affects retrieval quality — chunks that are too large lose specificity while chunks that are too small lose context. Common strategies include fixed-size chunking, semantic chunking, and sliding window chunking."
+  },
+  {
+    "question": "What is reranking and how does it improve RAG?",
+    "ground_truth": "Reranking is a post-retrieval step that reorders retrieved chunks by relevance before passing them to the language model. A cross-encoder reranker scores each query-chunk pair jointly, which is more accurate than similarity search alone. It improves RAG by reducing noise in the context window and improving faithfulness of the final answer."
+  },
+  {
+    "question": "What is LLMOps?",
+    "ground_truth": "LLMOps is the discipline of operationalizing large language model applications in production. It covers the full lifecycle from data preparation and model selection through deployment, monitoring, and continuous evaluation. Key practices include version-controlling prompts, tracking experiments, evaluating outputs systematically, monitoring latency and cost, and detecting model drift."
+  },
+  {
+    "question": "What does RAGAS measure?",
+    "ground_truth": "RAGAS measures faithfulness, which checks whether the generated answer is supported by the retrieved context. It also measures answer relevancy, which checks whether the answer addresses the user question, and context precision, which checks whether the retrieved chunks are relevant to the question. Each metric is scored from 0 to 1."
+  },
+  {
+    "question": "What are embeddings and which model is used?",
+    "ground_truth": "Embeddings are dense numerical representations of text that capture semantic meaning. When two pieces of text are semantically similar their embeddings are close together in vector space. The model all-MiniLM-L6-v2 produces 384-dimensional embeddings and is optimized for sentence-level similarity tasks."
+  },
+  {
+    "question": "What is observability in LLMOps?",
+    "ground_truth": "Observability in LLMOps means tracking the inputs, outputs, and intermediate steps of every LLM call in production. Tools like Langfuse, LangSmith, and Weights and Biases provide tracing dashboards that show the full chain of a request along with latency, token usage, and cost per request."
   }
 ]
