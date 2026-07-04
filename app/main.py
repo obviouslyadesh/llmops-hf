@@ -38,4 +38,5 @@ def health():
 def root():
     return FileResponse("app/static/index.html")
 
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
