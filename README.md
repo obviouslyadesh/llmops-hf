@@ -82,6 +82,8 @@ This platform provides a complete, production-ready RAG system with monitoring, 
 
 ## Demo
 
+## Live Huggingface Space Demo link: https://huggingface.co/spaces/adesh-bohara/llmops-hf
+
 ### Homepage & Document Upload
 ![Upload](images/Homepage.png)
 
