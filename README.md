@@ -1,11 +1,12 @@
---------------------------------
+---
 title: LLMOps Platform
 emoji: ⚡
 colorFrom: purple
 colorTo: blue
 sdk: docker
 pinned: false
----------------------------------
+---
+
 # LLMOps Platform ⚡
 
 > A production-grade Retrieval-Augmented Generation (RAG) system — upload documents, ask questions, get AI-powered answers grounded in your own data.
