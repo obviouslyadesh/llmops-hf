@@ -58,7 +58,7 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
             HTTP_REQUESTS_IN_PROGRESS.dec()
 
             logger.info(
-                "%s %.2f ms",
+                "%s %s %.2f ms",
                 method,
                 endpoint,
                 duration * 1000,
