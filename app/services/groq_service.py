@@ -182,7 +182,6 @@ class GroqService:
             usage = None
 
             for chunk in stream:
-
                 # Record latency when first token arrives
                 if not first_token:
                     LLM_DURATION_SECONDS.labels(
