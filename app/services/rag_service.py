@@ -90,27 +90,16 @@ class RAGService:
         retrieval_ms = (time.perf_counter() - retrieval_start) * 1000
 
         # Prometheus metric
-        RAG_RETRIEVAL_DURATION_SECONDS.observe(
-            retrieval_ms / 1000
-        )
+        RAG_RETRIEVAL_DURATION_SECONDS.observe(retrieval_ms / 1000)
 
-        contexts = [
-            hit.payload["text"]
-            for hit in results
-        ]
+        contexts = [hit.payload["text"] for hit in results]
 
-        sources = [
-            hit.payload["source"]
-            for hit in results
-        ]
+        sources = [hit.payload["source"] for hit in results]
 
         # Number of retrieved chunks
-        RAG_CHUNKS_RETRIEVED.observe(
-            len(contexts)
-        )
+        RAG_CHUNKS_RETRIEVED.observe(len(contexts))
 
         if use_reranker and contexts:
-
             RAG_RERANKER_REQUESTS_TOTAL.inc()
 
             rerank_start = time.perf_counter()
@@ -125,9 +114,7 @@ class RAGService:
                 top_k=3,
             )
 
-            RAG_RERANKER_DURATION_SECONDS.observe(
-                time.perf_counter() - rerank_start
-            )
+            RAG_RERANKER_DURATION_SECONDS.observe(time.perf_counter() - rerank_start)
 
         return contexts, sources, retrieval_ms
 
@@ -157,14 +144,10 @@ class RAGService:
         )
 
         if generation_ms is None:
-            generation_ms = (
-                time.perf_counter() - generation_start
-            ) * 1000
+            generation_ms = (time.perf_counter() - generation_start) * 1000
 
         # Prometheus metric
-        RAG_GENERATION_DURATION_SECONDS.observe(
-            generation_ms / 1000
-        )
+        RAG_GENERATION_DURATION_SECONDS.observe(generation_ms / 1000)
 
         try:
             self.langfuse_service.trace_chat(
@@ -202,9 +185,7 @@ class RAGService:
 
         context_text = "\n\n".join(contexts)
 
-        yield (
-            f"data: {json.dumps({'sources': sorted(list(set(sources)))})}\n\n"
-        )
+        yield (f"data: {json.dumps({'sources': sorted(list(set(sources)))})}\n\n")
 
         answer_parts = []
 
@@ -217,14 +198,10 @@ class RAGService:
             answer_parts.append(chunk)
             yield f"data: {json.dumps({'token': chunk})}\n\n"
 
-        generation_ms = (
-            time.perf_counter() - generation_start
-        ) * 1000
+        generation_ms = (time.perf_counter() - generation_start) * 1000
 
         # Prometheus metric
-        RAG_GENERATION_DURATION_SECONDS.observe(
-            generation_ms / 1000
-        )
+        RAG_GENERATION_DURATION_SECONDS.observe(generation_ms / 1000)
 
         final_answer = "".join(answer_parts)
 
@@ -238,8 +215,6 @@ class RAGService:
                 usage=None,
             )
         except Exception as e:
-            logger.warning(
-                f"Langfuse streaming trace failed: {e}"
-            )
+            logger.warning(f"Langfuse streaming trace failed: {e}")
 
         yield "data: [DONE]\n\n"

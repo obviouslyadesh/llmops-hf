@@ -6,7 +6,6 @@ from starlette.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.logger import logger
-
 from app.monitoring.metrics import (
     HTTP_REQUEST_DURATION_SECONDS,
     HTTP_REQUESTS_IN_PROGRESS,
@@ -43,11 +42,7 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
                 endpoint=endpoint,
             ).observe(duration)
 
-            status = (
-                str(response.status_code)
-                if "response" in locals()
-                else "500"
-            )
+            status = str(response.status_code) if "response" in locals() else "500"
 
             HTTP_RESPONSES_TOTAL.labels(
                 method=method,
@@ -63,6 +58,7 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
                 endpoint,
                 duration * 1000,
             )
+
 
 class APIKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:

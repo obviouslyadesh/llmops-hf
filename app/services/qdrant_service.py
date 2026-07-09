@@ -50,18 +50,12 @@ class QdrantService:
 
                 time.sleep(delay)
 
-        raise RuntimeError(
-            f"Qdrant unavailable at "
-            f"{settings.QDRANT_URL}"
-        )
+        raise RuntimeError(f"Qdrant unavailable at {settings.QDRANT_URL}")
 
     def _create_collection(self):
         collections = self.client.get_collections()
 
-        names = [
-            collection.name
-            for collection in collections.collections
-        ]
+        names = [collection.name for collection in collections.collections]
 
         if self.COLLECTION_NAME not in names:
             self.client.create_collection(
@@ -86,23 +80,15 @@ class QdrantService:
             points=points,
         )
 
-        QDRANT_INSERT_DURATION_SECONDS.observe(
-            time.perf_counter() - start
-        )
+        QDRANT_INSERT_DURATION_SECONDS.observe(time.perf_counter() - start)
 
         try:
-            collection = self.client.get_collection(
-                self.COLLECTION_NAME
-            )
+            collection = self.client.get_collection(self.COLLECTION_NAME)
 
-            QDRANT_POINTS_TOTAL.set(
-                collection.points_count
-            )
+            QDRANT_POINTS_TOTAL.set(collection.points_count)
 
         except Exception:
-            logger.warning(
-                "Unable to update Qdrant vector count metric."
-            )
+            logger.warning("Unable to update Qdrant vector count metric.")
 
     def search(
         self,
@@ -123,8 +109,6 @@ class QdrantService:
             limit=limit,
         )
 
-        QDRANT_SEARCH_DURATION_SECONDS.observe(
-            time.perf_counter() - start
-        )
+        QDRANT_SEARCH_DURATION_SECONDS.observe(time.perf_counter() - start)
 
         return results.points

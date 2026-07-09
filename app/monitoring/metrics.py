@@ -1,4 +1,10 @@
-from prometheus_client import Counter, Gauge, Histogram
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
+)
 
 # HTTP METRICS #
 
@@ -165,13 +171,11 @@ LLM_COST_USD_TOTAL = Counter(
 __all__ = [
     "CONTENT_TYPE_LATEST",
     "generate_latest",
-
     # HTTP
     "HTTP_REQUESTS_TOTAL",
     "HTTP_RESPONSES_TOTAL",
     "HTTP_REQUESTS_IN_PROGRESS",
     "HTTP_REQUEST_DURATION_SECONDS",
-
     # RAG
     "RAG_QUERIES_TOTAL",
     "RAG_RETRIEVAL_DURATION_SECONDS",
@@ -182,19 +186,16 @@ __all__ = [
     "RAG_EMPTY_RETRIEVALS_TOTAL",
     "RAG_CONTEXT_LENGTH",
     "RAG_SOURCE_DOCUMENTS",
-
     # Embeddings
     "EMBEDDING_REQUESTS_TOTAL",
     "EMBEDDING_DURATION_SECONDS",
     "EMBEDDING_FAILURES_TOTAL",
-
     # Qdrant
     "QDRANT_SEARCH_REQUESTS_TOTAL",
     "QDRANT_SEARCH_DURATION_SECONDS",
     "QDRANT_INSERT_REQUESTS_TOTAL",
     "QDRANT_INSERT_DURATION_SECONDS",
     "QDRANT_POINTS_TOTAL",
-
     # LLM
     "LLM_REQUESTS_TOTAL",
     "LLM_FAILURES_TOTAL",

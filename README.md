@@ -91,6 +91,15 @@ https://huggingface.co/spaces/adesh-bohara/llmops-hf
 ### Grafana Dashboard 2
 ![Grafana](images/Grafana%202.png)
 
+### Grafana LLM Usage Dashboard 1
+![Metrics](images/LLM%20Usage%201.png)
+
+### Grafana LLM Usage Dashboard 2
+![Metrics](images/LLM%20Usage%202.png)
+
+### Grafana RAG Pipeline Dashboard 1
+![Metrics](images/RAG%20Pipeline.png)
+
 ### Prometheus Metrics
 ![Metrics](images/Prometheus.png)
 

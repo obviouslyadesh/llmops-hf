@@ -41,7 +41,6 @@ Answer:
 
 
 class GroqService:
-
     def _estimate_cost(
         self,
         prompt_tokens: int,
@@ -49,13 +48,9 @@ class GroqService:
     ) -> float:
         """Estimate request cost in USD."""
 
-        prompt_cost = (
-            prompt_tokens / 1_000_000
-        ) * PROMPT_PRICE_PER_MILLION
+        prompt_cost = (prompt_tokens / 1_000_000) * PROMPT_PRICE_PER_MILLION
 
-        completion_cost = (
-            completion_tokens / 1_000_000
-        ) * COMPLETION_PRICE_PER_MILLION
+        completion_cost = (completion_tokens / 1_000_000) * COMPLETION_PRICE_PER_MILLION
 
         return prompt_cost + completion_cost
 
@@ -78,7 +73,6 @@ class GroqService:
         start = time.perf_counter()
 
         try:
-
             response = client.chat.completions.create(
                 model=GROQ_MODEL,
                 messages=[
@@ -100,7 +94,6 @@ class GroqService:
             usage = {}
 
             if response.usage:
-
                 prompt_tokens = response.usage.prompt_tokens
                 completion_tokens = response.usage.completion_tokens
                 total_tokens = response.usage.total_tokens
@@ -145,7 +138,6 @@ class GroqService:
             )
 
         except Exception:
-
             LLM_FAILURES_TOTAL.labels(
                 provider=PROVIDER,
                 model=GROQ_MODEL,
@@ -174,7 +166,6 @@ class GroqService:
         start = time.perf_counter()
 
         try:
-
             stream = client.chat.completions.create(
                 model=GROQ_MODEL,
                 messages=[
@@ -188,27 +179,72 @@ class GroqService:
             )
 
             first_token = False
+            usage = None
 
             for chunk in stream:
 
+                # Record latency when first token arrives
                 if not first_token:
-
                     LLM_DURATION_SECONDS.labels(
                         provider=PROVIDER,
                         model=GROQ_MODEL,
-                    ).observe(
-                        time.perf_counter() - start
-                    )
+                    ).observe(time.perf_counter() - start)
 
                     first_token = True
 
-                text = chunk.choices[0].delta.content
+                # Save usage from the final chunk (Groq sends it automatically)
+                if getattr(chunk, "usage", None):
+                    usage = chunk.usage
 
-                if text:
-                    yield text
+                # Stream token
+                if chunk.choices:
+                    text = chunk.choices[0].delta.content
+
+                    if text:
+                        yield text
+
+            # Update Prometheus metrics after stream completes
+            if usage:
+                prompt_tokens = usage.prompt_tokens
+                completion_tokens = usage.completion_tokens
+                total_tokens = usage.total_tokens
+
+                LLM_PROMPT_TOKENS_TOTAL.labels(
+                    provider=PROVIDER,
+                    model=GROQ_MODEL,
+                ).inc(prompt_tokens)
+
+                LLM_COMPLETION_TOKENS_TOTAL.labels(
+                    provider=PROVIDER,
+                    model=GROQ_MODEL,
+                ).inc(completion_tokens)
+
+                LLM_TOTAL_TOKENS_TOTAL.labels(
+                    provider=PROVIDER,
+                    model=GROQ_MODEL,
+                ).inc(total_tokens)
+
+                estimated_cost = self._estimate_cost(
+                    prompt_tokens,
+                    completion_tokens,
+                )
+
+                LLM_COST_USD_TOTAL.labels(
+                    provider=PROVIDER,
+                    model=GROQ_MODEL,
+                ).inc(estimated_cost)
+
+                logger.info(
+                    "Streaming usage | prompt=%d completion=%d total=%d cost=$%.8f",
+                    prompt_tokens,
+                    completion_tokens,
+                    total_tokens,
+                    estimated_cost,
+                )
+            else:
+                logger.warning("Groq streaming finished without usage information.")
 
         except Exception:
-
             LLM_FAILURES_TOTAL.labels(
                 provider=PROVIDER,
                 model=GROQ_MODEL,

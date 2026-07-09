@@ -34,9 +34,7 @@ class EmbeddingService:
                 normalize_embeddings=True,
             )
 
-            EMBEDDING_DURATION_SECONDS.observe(
-                time.perf_counter() - start
-            )
+            EMBEDDING_DURATION_SECONDS.observe(time.perf_counter() - start)
 
             return embedding.tolist()
 
@@ -60,9 +58,7 @@ class EmbeddingService:
                 normalize_embeddings=True,
             )
 
-            EMBEDDING_DURATION_SECONDS.observe(
-                time.perf_counter() - start
-            )
+            EMBEDDING_DURATION_SECONDS.observe(time.perf_counter() - start)
 
             return embeddings.tolist()
 
