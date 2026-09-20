@@ -19,7 +19,7 @@ logger = logging.getLogger("llmops")
 
 client = Groq(api_key=settings.GROQ_API_KEY)
 
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = "openai/gpt-oss-20b"
 PROVIDER = "groq"
 
 # Approximate pricing (USD per million tokens)
